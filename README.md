@@ -8,6 +8,7 @@ Retrieves the first google search result for a given query and puts it into clip
 Download
 
     git clone https://github.com/jlorich/chrisbot
+    bundle install
     
 Make chrisbot executable 
 
@@ -15,5 +16,5 @@ Make chrisbot executable
 
 ####Usage
 
-    ./chrisbot.rb search_term
+    ./chrisbot.rb
     
