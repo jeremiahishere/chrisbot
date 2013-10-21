@@ -94,4 +94,4 @@ class ChrisBot
   end
 end
 
-ChrisBot.act_as_chris("Bot Test", 0, true)
+ChrisBot.act_as_chris
