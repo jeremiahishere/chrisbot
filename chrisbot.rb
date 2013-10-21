@@ -1,17 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'googleajax'
-require 'clipboard'
 require 'skype'
-
-# module GoogleAjax
-#   class Search < Results
-#     def self.animated(query, latitude, longitude, args = {})
-#       args = { :sll => "#{latitude},#{longitude}" }.merge(args)
-#       get(:local, query, args)
-#     end
-#   end
-# end
 
 class ChrisBot
   attr_accessor :last_question, :chat, :images
@@ -33,7 +23,7 @@ class ChrisBot
   def get_first_google_result(term)
     begin
       if (self.images)
-        result = GoogleAjax::Search.images(term, {imgtype: "animated"})[:results][0]
+        result = GoogleAjax::Search.images(term, {imgtype: "animated", safe: "active"})[:results][0]
       else
         result = GoogleAjax::Search.web(term)[:results][0]
       end
@@ -64,6 +54,9 @@ class ChrisBot
     # Dont answer if the question hasn't changed
     return if question.body == @last_question
     
+    # log as last question regardless of working
+    @last_question = question.body
+
     # Log
     puts question.user + ": " + question.body
 
@@ -75,13 +68,10 @@ class ChrisBot
       return
     end
 
-   puts first_search_result_url
+     puts first_search_result_url
 
     # Put that question into clipboard
     @chat.post first_search_result_url
-
-    #Clipboard.copy first_search_result_url
-    @last_question = question.body
   end
 
   def self.act_as_chris(topic_includes = "cloudspace.com", min_size = 20, images=true)
