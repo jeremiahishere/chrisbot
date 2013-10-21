@@ -2,7 +2,7 @@ chrisbot
 ========
 
 ####acts_as_chris
-Retrieves the first google search result for a given query and puts it into clipboard so you can paste it in skype.
+A skype bot to automatically reply to a question with the first animated google image result.
 
 ####Installation
 Download
