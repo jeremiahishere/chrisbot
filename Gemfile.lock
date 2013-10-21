@@ -1,0 +1,18 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    clipboard (1.0.5)
+    googleajax (1.0.1)
+      json (>= 1.0.0)
+    json (1.8.1)
+    skype (0.2.7)
+      tmp_cache
+    tmp_cache (0.1.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  clipboard
+  googleajax
+  skype
