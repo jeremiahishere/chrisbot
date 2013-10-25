@@ -19,87 +19,50 @@ class ChrisBot
     raise 'No skype chat matching those parameters found' if @chat.nil?
   end
 
-  # Results the url of the first google search result for the given term
-  def get_first_google_result(term, type)
-    begin
-      case type
-        when :animated_image
-          puts "Image serach for #{term}"
-          result = GoogleAjax::Search.images(term, {imgtype: "animated", safe: "active"})[:results].sample(1)[0]
-          result = result[:unescaped_url] if !result.nil?
-        when :map 
-          puts "Map for #{term}"
-          result = "https://www.google.com/maps/preview#!q=" + URI::encode(term)
-        else
-          puts "Web serach for #{term}"
-          result = GoogleAjax::Search.web(term)[:results][0]
-          result = result[:unescaped_url] if !result.nil?
+  def parse_messages
+    words = {}
+    message = @chat.messages.last
+    body = message.body.strip.downcase
+    if(@current_message == body)
+      return {}
+    else 
+      @current_message = body
+      body.split.each do |word|
+        word = word.gsub(/(\W|\d)/, "").strip
+        unless(words.has_key?(word))
+          words[word] = 0
+        end
+        words[word] += 1;
       end
-      
-      return nil if result.nil?
-      
-      result
-    rescue
-      nil
+      return words
     end
   end
 
-  # Gets the most recent quesiton out of a skype chat with the given params
-  def get_most_recent_skype_question
-    @chat.messages.reverse.each do |m|
-      body = m.body.strip
-
-      if body.split('').last == "?"
-        return {body: body, user: m.user, type: :question}
-      
-      elsif body[0..3] == "map-"
-        return {body: body[4..-1], user: m.user, type: :map}
-
-      elsif body[0..4] == "map -"
-        return {body: body[5..-1], user: m.user, type: :map}
-
-      elsif body[0..3] == "gif-"
-        return {body: body[4..-1], user: m.user, type: :animated_image}
-
-      elsif body[0..4] == "gif -"
-        return {body: body[5..-1], user: m.user, type: :animated_image}
+  def at_least_one_match(messages, search_terms)
+    search_terms.each do |term|
+      if messages.has_key? term
+        return true
       end
-
-      next
     end
+    return false
   end
 
-  def answer_last_skype_question
-    # Get the most recent question in the cloudspace.com watercooler
-    question = get_most_recent_skype_question
-    body = question[:body]
-    user = question[:user]
-    type = question[:type]
-
-    # Dont answer if the question hasn't changed
-    return if body == @last_question
-
-    # Log
-    puts "#{user}: #{body}"
-
-    # Get the first search result fo rthat question
-    first_search_result_url = get_first_google_result(body, type)
-
-    @last_question = body
-
-    if first_search_result_url.nil?
-      puts "  No results found"
-      return
+  def all_terms_match(messages, search_terms)
+    search_terms.each do |term|
+      if !messages.has_key? term
+        return false
+      end
     end
+    return true
+  end
 
-     puts first_search_result_url
+  def already_ate(messages)
+    search_terms = ["food", "lunch", "hungry"] # show if one of these matches
+    stop_terms = ["i", "already", "ate", "lunch"] # don't show if all of the match
 
-    # Put that question into clipboard
-    case type
-      when :animated_image
-        @chat.post first_search_result_url + " (bot selected gif, proceed with caution)"
-      else
-        @chat.post first_search_result_url
+    if(at_least_one_match(messages, search_terms) && !all_terms_match(messages, stop_terms))
+      @chat.post("I already ate lunch")
+      puts "I already ate lunch"
     end
   end
 
@@ -107,10 +70,13 @@ class ChrisBot
     bot = ChrisBot.new(topic_includes, min_size)
 
     while true do    
-      bot.answer_last_skype_question
+      messages = bot.parse_messages
+      puts messages unless messages.empty?
+      bot.already_ate(messages)
+
       sleep(1)
     end
   end
 end
 
-ChrisBot.act_as_chris(topic_includes = "Bot Test", min_size = 0)
+ChrisBot.act_as_chris(topic_includes = "cloudspace.com", min_size = 0)

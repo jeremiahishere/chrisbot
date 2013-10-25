@@ -2,7 +2,7 @@ chrisbot
 ========
 
 ####acts_as_chris
-A skype bot to automatically reply to a question with the first animated google image result.
+A skype bot to automatically reply to automatically let everyone know I already ate lunch.
 
 ####Installation
 Download
