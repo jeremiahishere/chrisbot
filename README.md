@@ -18,3 +18,6 @@ Make chrisbot executable
 
     ./chrisbot.rb
     
+####Todo
+
+- Store the last few messages so that it can parse multiple messages per tick

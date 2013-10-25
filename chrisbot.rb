@@ -3,11 +3,12 @@
 require 'googleajax'
 require 'skype'
 require 'open-uri'
+require 'cleverbot-api'
 
 class ChrisBot
   attr_accessor :last_question, :chat
 
-  def initialize(topic_includes = "cloudspace.com", min_size = 20)
+  def initialize(topic_includes = "cloudspace.com", min_size = 20, use_cleverbot = false)
     GoogleAjax.referer = "cloudspace.com"
 
     # Get chat if it's doesn't exist
@@ -16,7 +17,27 @@ class ChrisBot
       puts "Found skype chat"
     end
 
+    if(use_cleverbot)
+      @cleverbot = CleverBot.new
+    end
+
     raise 'No skype chat matching those parameters found' if @chat.nil?
+  end
+
+  def cleverly_converse
+    message = @chat.messages.last
+    body = message.body.strip.downcase
+    if(@current_message == body)
+      return
+    else
+      @current_message = body
+    end
+
+    if(@cleverbot)
+      response = @cleverbot.think(body)
+      puts(response)
+      @chat.post(response)
+    end
   end
 
   def parse_messages
@@ -66,17 +87,33 @@ class ChrisBot
     end
   end
 
-  def self.act_as_chris(topic_includes = "cloudspace.com", min_size = 20)
-    bot = ChrisBot.new(topic_includes, min_size)
+  # note that this trigger's off of joey's bot messages and is currently off
+  def bot_club(messages)
+    search_terms = ["bot"]
+    stop_terms = ["bot", "club"]
+
+    if(at_least_one_match(messages, search_terms) && !all_terms_match(messages, stop_terms))
+      @chat.post("The first rule of Bot Club is You don't talk about Bot Club")
+      puts "The first rule of Bot Club is You don't talk about Bot Club"
+    end
+
+  end
+
+  def self.act_as_chris(topic_includes = "cloudspace.com", min_size = 1, use_cleverbot = false)
+    bot = ChrisBot.new(topic_includes, min_size, use_cleverbot)
 
     while true do    
-      messages = bot.parse_messages
-      puts messages unless messages.empty?
-      bot.already_ate(messages)
-
-      sleep(1)
+      if(use_cleverbot)
+        bot.cleverly_converse
+        sleep(15)
+      else
+        messages = bot.parse_messages
+        puts messages unless messages.empty?
+        bot.already_ate(messages)
+        sleep(1)
+      end
     end
   end
 end
 
-ChrisBot.act_as_chris(topic_includes = "cloudspace.com", min_size = 0)
+ChrisBot.act_as_chris(topic_includes = "Mashery", min_size = 0, use_cleverbot = true)
