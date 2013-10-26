@@ -27,15 +27,19 @@ class ChrisBot
   def cleverly_converse
     message = @chat.messages.last
     body = message.body.strip.downcase
-    if(@current_message == body)
-      return
-    else
-      @current_message = body
-    end
+    puts "body: " + body
+    if @current_message then puts "current message: " + @current_message end
+    if @previous_message then puts "previous message: " + @previous_message end
 
+    if(@current_message == body || @previous_message == body)
+      @previous_message = @current_message
+      return
+    end
     if(@cleverbot)
       response = @cleverbot.think(body)
-      puts(response)
+      @previous_message = @current_message
+      @current_message = response.strip.downcase
+      # puts(response)
       @chat.post(response)
     end
   end
@@ -105,7 +109,7 @@ class ChrisBot
     while true do    
       if(use_cleverbot)
         bot.cleverly_converse
-        sleep(15)
+        sleep(5)
       else
         messages = bot.parse_messages
         puts messages unless messages.empty?
@@ -116,4 +120,4 @@ class ChrisBot
   end
 end
 
-ChrisBot.act_as_chris(topic_includes = "Mashery", min_size = 0, use_cleverbot = true)
+ChrisBot.act_as_chris(topic_includes = "Danielle", min_size = 0, use_cleverbot = true)
