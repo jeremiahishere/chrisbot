@@ -27,9 +27,9 @@ class ChrisBot
   def cleverly_converse
     message = @chat.messages.last
     body = message.body.strip.downcase
-    puts "body: " + body
-    if @current_message then puts "current message: " + @current_message end
-    if @previous_message then puts "previous message: " + @previous_message end
+    # puts "body: " + body
+    # if @current_message then puts "current message: " + @current_message end
+    # if @previous_message then puts "previous message: " + @previous_message end
 
     if(@current_message == body || @previous_message == body)
       @previous_message = @current_message
@@ -39,7 +39,7 @@ class ChrisBot
       response = @cleverbot.think(body)
       @previous_message = @current_message
       @current_message = response.strip.downcase
-      # puts(response)
+      puts("'" + response + "' to '" + body + "'" )
       @chat.post(response)
     end
   end
@@ -82,7 +82,7 @@ class ChrisBot
   end
 
   def already_ate(messages)
-    search_terms = ["food", "lunch", "hungry"] # show if one of these matches
+    search_terms = ["food", "lunch", "hungry", "eat", "ate"] # show if one of these matches
     stop_terms = ["i", "already", "ate", "lunch"] # don't show if all of the match
 
     if(at_least_one_match(messages, search_terms) && !all_terms_match(messages, stop_terms))
@@ -109,15 +109,15 @@ class ChrisBot
     while true do    
       if(use_cleverbot)
         bot.cleverly_converse
-        sleep(5)
+        sleep(60)
       else
         messages = bot.parse_messages
         puts messages unless messages.empty?
         bot.already_ate(messages)
-        sleep(1)
+        sleep(10)
       end
     end
   end
 end
 
-ChrisBot.act_as_chris(topic_includes = "Danielle", min_size = 0, use_cleverbot = true)
+ChrisBot.act_as_chris(topic_includes = "cloudspace.com", min_size = 0, use_cleverbot = false)
