@@ -82,7 +82,7 @@ class ChrisBot
   end
 
   def already_ate(messages)
-    search_terms = ["food", "lunch", "hungry", "eat", "ate"] # show if one of these matches
+    search_terms = ["food", "lunch", "hungry", "eat", "ate", "eaten"] # show if one of these matches
     stop_terms = ["i", "already", "ate", "lunch"] # don't show if all of the match
 
     if(at_least_one_match(messages, search_terms) && !all_terms_match(messages, stop_terms))
@@ -120,4 +120,4 @@ class ChrisBot
   end
 end
 
-ChrisBot.act_as_chris(topic_includes = "cloudspace.com", min_size = 0, use_cleverbot = false)
+ChrisBot.act_as_chris(topic_includes = "", min_size = 5, use_cleverbot = false)
