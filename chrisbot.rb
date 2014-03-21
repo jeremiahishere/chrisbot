@@ -120,4 +120,4 @@ class ChrisBot
   end
 end
 
-ChrisBot.act_as_chris(topic_includes = "", min_size = 5, use_cleverbot = false)
+ChrisBot.act_as_chris(topic_includes = "Lunch", min_size = 5, use_cleverbot = true)
